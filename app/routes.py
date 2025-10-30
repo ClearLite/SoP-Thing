@@ -26,15 +26,13 @@ def index():
     characters = Character.query.order_by(Character.smash_count.desc()).all()
     return render_template('index.html', characters=characters)
 
-# NEW: Character Detail Page Route
 @main.route('/character/<int:character_id>', methods=['GET', 'POST'])
 def character_detail(character_id):
     character = Character.query.get_or_404(character_id)
 
-    # Handle additional image upload
     if request.method == 'POST':
         if not current_user.is_authenticated:
-            abort(403) # Forbidden
+            abort(403)
         
         if 'additional_images' not in request.files:
             flash('No file part')
@@ -45,7 +43,6 @@ def character_detail(character_id):
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-                # To prevent overwrites, you might want to add a unique prefix
                 file.save(filepath)
                 new_image = AdditionalImage(filename=filename, character_id=character.id)
                 db.session.add(new_image)
@@ -56,13 +53,31 @@ def character_detail(character_id):
 
     return render_template('character_detail.html', character=character)
 
-# NEW: Delete Character Route
+# NEW: Route to set an additional image as the main cover
+@main.route('/set-cover-image/<int:image_id>', methods=['POST'])
+@login_required
+def set_cover_image(image_id):
+    image_to_promote = AdditionalImage.query.get_or_404(image_id)
+    character = image_to_promote.character
+    
+    # The filenames to be swapped
+    old_cover_filename = character.image_file
+    new_cover_filename = image_to_promote.filename
+    
+    # Swap the filenames in the database
+    character.image_file = new_cover_filename
+    image_to_promote.filename = old_cover_filename
+    
+    db.session.commit()
+    flash(f'Cover image for {character.name} has been updated!')
+    return redirect(url_for('main.character_detail', character_id=character.id))
+
+
 @main.route('/delete-character/<int:character_id>', methods=['POST'])
 @login_required
 def delete_character(character_id):
     character = Character.query.get_or_404(character_id)
     
-    # Delete all associated image files
     delete_file(character.image_file)
     for image in character.additional_images:
         delete_file(image.filename)
@@ -72,7 +87,6 @@ def delete_character(character_id):
     flash(f'{character.name} has been deleted.')
     return redirect(url_for('main.index'))
 
-# NEW: Delete Additional Image Route
 @main.route('/delete-image/<int:image_id>', methods=['POST'])
 @login_required
 def delete_image(image_id):
