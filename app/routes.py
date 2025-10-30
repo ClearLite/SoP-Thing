@@ -2,20 +2,88 @@
 import os
 import random
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from .models import db, Character, GeneralTag, SpeciesTag
+from .models import db, Character, GeneralTag, SpeciesTag, AdditionalImage
 
 main = Blueprint('main', __name__)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
+def delete_file(filename):
+    """Safely deletes a file from the uploads folder."""
+    try:
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+    except Exception as e:
+        print(f"Error deleting file {filename}: {e}") # Log error
+
 @main.route('/')
 def index():
     characters = Character.query.order_by(Character.smash_count.desc()).all()
     return render_template('index.html', characters=characters)
+
+# NEW: Character Detail Page Route
+@main.route('/character/<int:character_id>', methods=['GET', 'POST'])
+def character_detail(character_id):
+    character = Character.query.get_or_404(character_id)
+
+    # Handle additional image upload
+    if request.method == 'POST':
+        if not current_user.is_authenticated:
+            abort(403) # Forbidden
+        
+        if 'additional_images' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        files = request.files.getlist('additional_images')
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                # To prevent overwrites, you might want to add a unique prefix
+                file.save(filepath)
+                new_image = AdditionalImage(filename=filename, character_id=character.id)
+                db.session.add(new_image)
+        
+        db.session.commit()
+        flash('Additional images have been uploaded!')
+        return redirect(url_for('main.character_detail', character_id=character.id))
+
+    return render_template('character_detail.html', character=character)
+
+# NEW: Delete Character Route
+@main.route('/delete-character/<int:character_id>', methods=['POST'])
+@login_required
+def delete_character(character_id):
+    character = Character.query.get_or_404(character_id)
+    
+    # Delete all associated image files
+    delete_file(character.image_file)
+    for image in character.additional_images:
+        delete_file(image.filename)
+
+    db.session.delete(character)
+    db.session.commit()
+    flash(f'{character.name} has been deleted.')
+    return redirect(url_for('main.index'))
+
+# NEW: Delete Additional Image Route
+@main.route('/delete-image/<int:image_id>', methods=['POST'])
+@login_required
+def delete_image(image_id):
+    image = AdditionalImage.query.get_or_404(image_id)
+    character_id = image.character_id
+    delete_file(image.filename)
+    db.session.delete(image)
+    db.session.commit()
+    flash('Image has been deleted.')
+    return redirect(url_for('main.character_detail', character_id=character_id))
+
 
 @main.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -30,7 +98,6 @@ def admin_panel():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # To avoid overwrites, add a unique prefix or check for existence
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
@@ -42,7 +109,6 @@ def admin_panel():
                 image_file=filename
             )
             
-            # Add tags
             general_tags_ids = request.form.getlist('general_tags')
             species_tags_ids = request.form.getlist('species_tags')
             
@@ -76,7 +142,6 @@ def start_game():
 
     query = Character.query
     
-    # Filter by gender
     if gender == 'Boy':
         query = query.filter(Character.gender == 'Boy')
     elif gender == 'Girl':
@@ -84,16 +149,12 @@ def start_game():
     elif gender == 'MaleAndFemale':
          query = query.filter(Character.gender.in_(['Boy', 'Girl']))
 
-    # Filter by tags
     if 'all' not in selected_tags_ids:
         query = query.filter(Character.general_tags.any(GeneralTag.id.in_(selected_tags_ids)))
     
     all_filtered_chars = query.all()
-    
-    # Shuffle the list
     random.shuffle(all_filtered_chars)
     
-    # Select number of characters
     if num_characters == 'all':
         final_list = all_filtered_chars
     else:
@@ -104,7 +165,6 @@ def start_game():
         else:
             final_list = all_filtered_chars[:num]
             
-    # Make sure the list is a power of 2 for a simple bracket
     n = len(final_list)
     if n > 1 and (n & (n-1)) != 0:
         power = 1
@@ -117,7 +177,6 @@ def start_game():
         flash('Not enough characters to start a game with the selected filters. Please try again.')
         return redirect(url_for('main.game_setup'))
         
-    # Convert characters to JSON-serializable format
     characters_for_game = [{
         'id': char.id,
         'name': char.name,
