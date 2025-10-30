@@ -1,0 +1,61 @@
+<!-- app/templates/character_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container detail-container">
+    <div class="main-character-info">
+        <div class="main-image-wrapper">
+            <img src="{{ url_for('static', filename='uploads/' + character.image_file) }}" alt="{{ character.name }}">
+        </div>
+        <div class="main-details">
+            <h1>{{ character.name }}</h1>
+            <p><strong>From:</strong> {{ character.from_where }}</p>
+            <p><strong>Age:</strong> {{ character.age }}</p>
+            <p><strong>Gender:</strong> {{ character.gender }}</p>
+            <div class="tags">
+                {% for tag in character.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
+                {% for tag in character.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
+            </div>
+            <div class="stats">
+                <span class="smash">💖 Smashes: {{ character.smash_count }}</span>
+                <span class="pass">💔 Passes: {{ character.pass_count }}</span>
+            </div>
+            <a href="{{ url_for('main.index') }}" class="btn btn-back">← Back to Hall of Fame</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Additional Images</h2>
+    {% if current_user.is_authenticated %}
+    <div class="form-container admin-upload-form">
+        <h3>Upload More Images</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" id="additional_images" name="additional_images" accept="image/*" multiple required>
+            </div>
+            <button type="submit" class="btn">Upload</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="additional-images-grid">
+        {% for image in character.additional_images %}
+        <div class="card-container">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Additional image">
+            </div>
+             {% if current_user.is_authenticated %}
+             <form method="POST" action="{{ url_for('main.delete_image', image_id=image.id) }}"
+                   onsubmit="return confirm('Are you sure you want to delete this image?');"
+                   class="delete-form">
+                 <button type="submit" class="btn-delete">❌</button>
+             </form>
+             {% endif %}
+        </div>
+        {% else %}
+        <p>No additional images have been uploaded for this character yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
