@@ -12,6 +12,17 @@
     </div>
 </div>
 
+<!-- NEW: Modal structure for viewing additional images -->
+<div id="image-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <div id="modal-image-gallery" class="modal-image-gallery">
+            <!-- Images will be injected here by JS -->
+        </div>
+        <p id="modal-no-images-msg" style="display: none;">This character has no additional images.</p>
+    </div>
+</div>
+
 <script>
     // Pass the character data from Flask to JavaScript
     const initialCharacters = {{ characters_json|safe }};
