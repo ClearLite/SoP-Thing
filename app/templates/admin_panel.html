@@ -27,20 +27,28 @@
             </select>
         </div>
         <div class="form-group">
-            <label>General Tags (Hold Ctrl/Cmd to select multiple)</label>
-            <select name="general_tags" multiple required size="5">
+            <!-- NEW: Checkbox UI for Tags -->
+            <label>General Tags</label>
+            <div class="tag-checkbox-container">
                 {% for tag in general_tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                    <div class="tag-option">
+                        <input type="checkbox" id="gen-tag-{{ tag.id }}" name="general_tags" value="{{ tag.id }}">
+                        <label for="gen-tag-{{ tag.id }}">{{ tag.name }}</label>
+                    </div>
                 {% endfor %}
-            </select>
+            </div>
         </div>
         <div class="form-group">
-            <label>Species Tags (Hold Ctrl/Cmd to select multiple)</label>
-            <select name="species_tags" multiple required size="4">
+            <!-- NEW: Checkbox UI for Tags -->
+            <label>Species Tags</label>
+            <div class="tag-checkbox-container">
                 {% for tag in species_tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                    <div class="tag-option">
+                        <input type="checkbox" id="spec-tag-{{ tag.id }}" name="species_tags" value="{{ tag.id }}">
+                        <label for="spec-tag-{{ tag.id }}">{{ tag.name }}</label>
+                    </div>
                 {% endfor %}
-            </select>
+            </div>
         </div>
         <div class="form-group">
             <label for="image">Image</label>
