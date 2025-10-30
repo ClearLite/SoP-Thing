@@ -28,6 +28,15 @@ class Character(db.Model):
     
     species_tags = db.relationship('SpeciesTag', secondary=characters_species_tags, lazy='subquery',
         backref=db.backref('characters', lazy=True))
+    
+    # NEW: Relationship to additional images
+    additional_images = db.relationship('AdditionalImage', backref='character', lazy=True, cascade="all, delete-orphan")
+
+# NEW: Model for additional images
+class AdditionalImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    character_id = db.Column(db.Integer, db.ForeignKey('character.id'), nullable=False)
 
 class GeneralTag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
