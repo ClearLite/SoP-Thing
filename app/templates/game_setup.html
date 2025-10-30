@@ -1,0 +1,40 @@
+<!-- app/templates/game_setup.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container form-container">
+    <h2>Start a New Game!</h2>
+    <form action="{{ url_for('main.start_game') }}" method="POST">
+        <div class="form-group">
+            <label>Select Categories (Hold Ctrl/Cmd for multiple, or choose 'All')</label>
+            <select name="general_tags" multiple required size="8">
+                <option value="all" selected>All Categories</option>
+                {% for tag in general_tags %}
+                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="num_characters">Number of Participants</label>
+            <select id="num_characters" name="num_characters">
+                <option value="4">4</option>
+                <option value="8">8</option>
+                <option value="16">16</option>
+                <option value="32">32</option>
+                <option value="64">64</option>
+                <option value="all" selected>All Available</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender Preference</label>
+            <select id="gender" name="gender">
+                <option value="All">All Genders</option>
+                <option value="Boy">Boys Only</option>
+                <option value="Girl">Girls Only</option>
+                <option value="MaleAndFemale">Boys and Girls</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Start Bracket!</button>
+    </form>
+</div>
+{% endblock %}
