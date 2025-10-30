@@ -5,6 +5,24 @@
 <div class="container">
     <h1>Hall of Fame</h1>
     <p>See who's winning hearts! Click on a card to see more.</p>
+
+    <!-- NEW: Sort Bar -->
+    <div class="sort-bar">
+        <span>Sort by:</span>
+        <a href="{{ url_for('main.index', sort='az') }}" 
+           class="btn btn-sort {% if current_sort == 'az' %}active{% endif %}">
+           A-Z
+        </a>
+        <a href="{{ url_for('main.index', sort='smashes') }}" 
+           class="btn btn-sort {% if current_sort == 'smashes' %}active{% endif %}">
+           Most Smashes
+        </a>
+        <a href="{{ url_for('main.index', sort='passes') }}" 
+           class="btn btn-sort {% if current_sort == 'passes' %}active{% endif %}">
+           Most Passes
+        </a>
+    </div>
+
     <div class="character-grid">
         {% for char in characters %}
         <div class="card-container">
@@ -29,11 +47,13 @@
                 </div>
             </a>
             {% if current_user.is_authenticated %}
-            <form method="POST" action="{{ url_for('main.delete_character', character_id=char.id) }}"
+            <div class="admin-actions-on-card">
+                 <form method="POST" action="{{ url_for('main.delete_character', character_id=char.id) }}"
                   onsubmit="return confirm('Are you sure you want to delete {{ char.name }}? This cannot be undone.');"
                   class="delete-form">
-                <button type="submit" class="btn-delete">❌</button>
-            </form>
+                    <button type="submit" class="btn-delete">❌</button>
+                </form>
+            </div>
             {% endif %}
         </div>
         {% else %}
