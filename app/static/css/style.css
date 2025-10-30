@@ -45,39 +45,19 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 }
 .btn:hover { background: var(--secondary-color); transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px var(--glow-color); }
 
-/* NEW: Sort Bar Styles */
 .sort-bar {
-    background: var(--surface-color);
-    padding: 1rem;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border: 1px solid #4a4e55;
+    background: var(--surface-color); padding: 1rem; margin-bottom: 2rem; border-radius: 15px;
+    display: flex; align-items: center; gap: 1rem; border: 1px solid #4a4e55;
 }
-.sort-bar span {
-    font-weight: bold;
-    color: var(--text-muted-color);
-}
-.btn-sort {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    background: #4a4e55;
-    color: var(--text-muted-color);
-    text-decoration: none;
-}
-.btn-sort.active {
-    background: var(--primary-color);
-    color: #000;
-    box-shadow: 0 0 15px var(--glow-color);
-}
+.sort-bar span { font-weight: bold; color: var(--text-muted-color); }
+.btn-sort { padding: 0.5rem 1rem; font-size: 0.9rem; background: #4a4e55; color: var(--text-muted-color); text-decoration: none; }
+.btn-sort.active { background: var(--primary-color); color: #000; box-shadow: 0 0 15px var(--glow-color); }
 
-/* Cards */
 .character-grid, .additional-images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
 .card-container {
     position: relative; background: var(--surface-color); border-radius: 15px; overflow: hidden;
     box-shadow: 0 8px 25px rgba(0,0,0,0.5); border: 1px solid #4a4e55; transition: all 0.3s ease-in-out;
+    display: flex; flex-direction: column; /* This helps position the button bar at the bottom */
 }
 .card-container:hover { transform: translateY(-10px); box-shadow: 0 0 30px var(--glow-color); border-color: var(--primary-color); }
 .character-card-link { text-decoration: none; }
@@ -85,6 +65,7 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .image-container {
     width: 100%; height: 350px; background-color: var(--background-color); display: flex;
     align-items: center; justify-content: center; overflow: hidden;
+    flex-grow: 1; /* Allow the image to take available space */
 }
 .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
 .card-container:hover .image-container img { transform: scale(1.05); }
@@ -95,7 +76,6 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .stats { margin-top: 1rem; display: flex; justify-content: space-between; font-weight: bold; }
 .smash { color: var(--heart-smash); } .pass { color: var(--heart-pass); }
 
-/* Admin Delete Button on Home Page Cards */
 .admin-actions-on-card { position: absolute; top: 10px; right: 10px; z-index: 10; }
 .delete-form { margin: 0; }
 .btn-delete {
@@ -104,21 +84,32 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 }
 .btn-delete:hover { background: var(--heart-smash); }
 
-/* --- FIX: Admin Action Buttons on Detail Page --- */
-/* This is the corrected, always-visible style. The old hover effect is gone. */
-.admin-actions-visible {
-    background: rgba(0,0,0,0.7); padding: 10px; display: flex; justify-content: space-around;
+/* --- DEFINITIVE FIX V3: Admin Action Buttons --- */
+.admin-button-bar {
+    background: #25272b;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    /* This bar is now part of the normal document flow at the bottom of the card */
 }
-.admin-action-form { margin: 0; }
+.admin-action-form { margin: 0; flex-grow: 1; display: flex; }
 .btn-action {
-    background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 20px;
-    cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.3s;
+    width: 100%;
+    background: var(--surface-color);
+    border: 1px solid #4a4e55;
+    color: var(--text-muted-color);
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s;
 }
-.btn-action.btn-cover:hover { background: #2980b9; border-color: #2980b9; }
-.btn-action.btn-delete:hover { background: var(--heart-smash); border-color: var(--heart-smash); }
-/* --- END FIX --- */
+.btn-action.btn-cover:hover { background: #2980b9; border-color: #2980b9; color: white; }
+.btn-action.btn-delete:hover { background: var(--heart-smash); border-color: var(--heart-smash); color: white; }
+/* --- END FIX V3 --- */
 
-/* Character Detail Page Layout */
 .detail-container h1 { font-size: 4rem; text-align: left; margin-bottom: 1rem; }
 .main-character-info { display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start; }
 .main-image-wrapper { flex: 1; min-width: 300px; max-width: 400px; }
@@ -133,7 +124,6 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .btn-back { margin-top: 1.5rem; background: var(--surface-color); color: var(--text-color); border: 1px solid var(--primary-color); }
 hr { border: 0; height: 1px; background-image: linear-gradient(to right, transparent, var(--primary-color), transparent); margin: 3rem 0; }
 
-/* Game Page & Winner */
 .game-container { text-align: center; }
 .matchup-area { display: flex; justify-content: center; align-items: flex-start; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
 .vs-text { align-self: center; font-size: 3rem; }
@@ -146,7 +136,6 @@ hr { border: 0; height: 1px; background-image: linear-gradient(to right, transpa
 .winner-card h2 { font-size: 3rem; color: var(--primary-color); animation: glow 1.5s infinite alternate; }
 @keyframes bounceIn { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
 
-/* Modal Styles */
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
 .modal-content { background: var(--surface-color); margin: auto; padding: 20px; border: 1px solid var(--primary-color); width: 90%; max-width: 1200px; max-height: 90vh; border-radius: 15px; box-shadow: 0 0 30px var(--glow-color); position: relative; display: flex; flex-direction: column; }
 .modal-close-btn { color: var(--text-muted-color); position: absolute; top: 10px; right: 25px; font-size: 35px; font-weight: bold; cursor: pointer; transition: color 0.3s; z-index: 1010; }
