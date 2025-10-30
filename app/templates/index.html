@@ -4,24 +4,37 @@
 {% block content %}
 <div class="container">
     <h1>Hall of Fame</h1>
-    <p>See who's winning hearts!</p>
+    <p>See who's winning hearts! Click on a card to see more.</p>
     <div class="character-grid">
         {% for char in characters %}
-        <div class="character-card">
-            <img src="{{ url_for('static', filename='uploads/' + char.image_file) }}" alt="{{ char.name }}">
-            <div class="card-info">
-                <h3>{{ char.name }}</h3>
-                <p><strong>From:</strong> {{ char.from_where }}</p>
-                <p><strong>Age:</strong> {{ char.age }} | <strong>Gender:</strong> {{ char.gender }}</p>
-                <div class="tags">
-                    {% for tag in char.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
-                    {% for tag in char.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
+        <div class="card-container">
+            <a href="{{ url_for('main.character_detail', character_id=char.id) }}" class="character-card-link">
+                <div class="character-card">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename='uploads/' + char.image_file) }}" alt="{{ char.name }}">
+                    </div>
+                    <div class="card-info">
+                        <h3>{{ char.name }}</h3>
+                        <p><strong>From:</strong> {{ char.from_where }}</p>
+                        <p><strong>Age:</strong> {{ char.age }} | <strong>Gender:</strong> {{ char.gender }}</p>
+                        <div class="tags">
+                            {% for tag in char.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
+                            {% for tag in char.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
+                        </div>
+                        <div class="stats">
+                            <span class="smash">💖 Smashes: {{ char.smash_count }}</span>
+                            <span class="pass">💔 Passes: {{ char.pass_count }}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stats">
-                    <span class="smash">💖 Smash: {{ char.smash_count }}</span>
-                    <span class="pass">💔 Pass: {{ char.pass_count }}</span>
-                </div>
-            </div>
+            </a>
+            {% if current_user.is_authenticated %}
+            <form method="POST" action="{{ url_for('main.delete_character', character_id=char.id) }}"
+                  onsubmit="return confirm('Are you sure you want to delete {{ char.name }}? This cannot be undone.');"
+                  class="delete-form">
+                <button type="submit" class="btn-delete">❌</button>
+            </form>
+            {% endif %}
         </div>
         {% else %}
         <p>No characters have been added yet. An admin needs to add some!</p>
