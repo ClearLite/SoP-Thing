@@ -36,7 +36,7 @@ def index():
 
 @main.route('/character/<int:character_id>', methods=['GET', 'POST'])
 def character_detail(character_id):
-    character = Character.query.get_or_4_4(character_id)
+    character = Character.query.get_or_404(character_id)
     if request.method == 'POST':
         if not current_user.is_authenticated:
             abort(403)
@@ -56,14 +56,47 @@ def character_detail(character_id):
         return redirect(url_for('main.character_detail', character_id=character.id))
     return render_template('character_detail.html', character=character)
 
-# The 'set_cover_image' and 'delete_image' routes have been completely removed.
+@main.route('/character/<int:character_id>/set-cover/<int:image_id>', methods=['POST'])
+@login_required
+def set_cover_image(character_id, image_id):
+    character = Character.query.get_or_404(character_id)
+    new_cover_image = AdditionalImage.query.get_or_404(image_id)
+
+    if new_cover_image.character_id != character.id:
+        abort(403) # Prevent changing cover for another character's image
+
+    old_cover_filename = character.image_file
+    new_cover_filename = new_cover_image.filename
+    
+    # Swap the filenames
+    character.image_file = new_cover_filename
+    new_cover_image.filename = old_cover_filename
+    
+    db.session.commit()
+    flash('Cover image has been updated.')
+    return redirect(url_for('main.character_detail', character_id=character.id))
+
+@main.route('/delete-image/<int:image_id>', methods=['POST'])
+@login_required
+def delete_image(image_id):
+    image_to_delete = AdditionalImage.query.get_or_404(image_id)
+    character_id = image_to_delete.character_id
+    
+    # Delete the physical file
+    delete_file(image_to_delete.filename)
+    
+    # Delete the database record
+    db.session.delete(image_to_delete)
+    db.session.commit()
+    
+    flash('Image has been deleted.')
+    return redirect(url_for('main.character_detail', character_id=character_id))
 
 @main.route('/delete-character/<int:character_id>', methods=['POST'])
 @login_required
 def delete_character(character_id):
     character = Character.query.get_or_404(character_id)
     delete_file(character.image_file)
-    # Since we can't delete individual images anymore, we only need to delete them when the character is deleted.
     for image in character.additional_images:
         delete_file(image.filename)
     db.session.delete(character)
