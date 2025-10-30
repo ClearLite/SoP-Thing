@@ -1,8 +1,8 @@
 /* app/static/css/style.css */
-@keyframes backgroundPulse {
-    0% { background-color: #2c2f33; }
-    50% { background-color: #382c33; }
-    100% { background-color: #2c2f33; }
+@keyframes animatedGradient {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
 }
 @keyframes glow {
     from { text-shadow: 0 0 5px #ff80c0, 0 0 10px #ff80c0; }
@@ -14,8 +14,14 @@
     --glow-color: rgba(255, 128, 192, 0.5); --heart-smash: #ff4757; --heart-pass: #bdc3c7;
 }
 body {
-    font-family: 'Roboto', sans-serif; background-color: var(--background-color); color: var(--text-color);
-    margin: 0; line-height: 1.6; animation: backgroundPulse 15s infinite ease-in-out;
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-color);
+    margin: 0; 
+    line-height: 1.6;
+    /* NEW: Animated Gradient Background */
+    background: linear-gradient(-45deg, #2c2f33, #4d3a44, #2c3338, #23272A);
+    background-size: 400% 400%;
+    animation: animatedGradient 20s ease infinite;
 }
 .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
 h1, h2, h3 { font-family: 'Pacifico', cursive; color: var(--primary-color); text-shadow: 0 0 8px var(--glow-color); }
@@ -44,6 +50,49 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
     text-transform: uppercase;
 }
 .btn:hover { background: var(--secondary-color); transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px var(--glow-color); }
+
+/* NEW: Styles for the improved tag selection UI */
+.tag-checkbox-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    background-color: var(--background-color);
+    border: 2px solid #4a4e55;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+.tag-checkbox-container:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+.tag-checkbox-container input[type="checkbox"] {
+    display: none; /* Hide the default checkbox */
+}
+.tag-checkbox-container label {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: #4f545c;
+    color: var(--text-muted-color);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+.tag-checkbox-container label:hover {
+    background-color: #5c616a;
+    color: white;
+}
+.tag-checkbox-container input[type="checkbox"]:checked + label {
+    background-color: var(--primary-color);
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 0 10px var(--glow-color);
+    transform: scale(1.05);
+    border-color: var(--secondary-color);
+}
 
 .sort-bar {
     background: var(--surface-color); padding: 1rem; margin-bottom: 2rem; border-radius: 15px;
