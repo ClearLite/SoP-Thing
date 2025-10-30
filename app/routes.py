@@ -21,37 +21,28 @@ def delete_file(filename):
     except Exception as e:
         print(f"Error deleting file {filename}: {e}") # Log error
 
-# MODIFIED: This route now handles sorting
 @main.route('/')
 def index():
-    # Get the sort method from URL query parameters, default to 'az'
     sort_method = request.args.get('sort', 'az')
-    
     query = Character.query
-
     if sort_method == 'smashes':
         query = query.order_by(Character.smash_count.desc())
     elif sort_method == 'passes':
         query = query.order_by(Character.pass_count.desc())
-    else: # Default to 'az' (A-Z)
+    else:
         query = query.order_by(Character.name.asc())
-
     characters = query.all()
-    # Pass the current sort method to the template to highlight the active button
     return render_template('index.html', characters=characters, current_sort=sort_method)
 
 @main.route('/character/<int:character_id>', methods=['GET', 'POST'])
 def character_detail(character_id):
-    character = Character.query.get_or_404(character_id)
-
+    character = Character.query.get_or_4_4(character_id)
     if request.method == 'POST':
         if not current_user.is_authenticated:
             abort(403)
-        
         if 'additional_images' not in request.files:
             flash('No file part')
             return redirect(request.url)
-
         files = request.files.getlist('additional_images')
         for file in files:
             if file and allowed_file(file.filename):
@@ -60,55 +51,25 @@ def character_detail(character_id):
                 file.save(filepath)
                 new_image = AdditionalImage(filename=filename, character_id=character.id)
                 db.session.add(new_image)
-        
         db.session.commit()
         flash('Additional images have been uploaded!')
         return redirect(url_for('main.character_detail', character_id=character.id))
-
     return render_template('character_detail.html', character=character)
 
-@main.route('/set-cover-image/<int:image_id>', methods=['POST'])
-@login_required
-def set_cover_image(image_id):
-    image_to_promote = AdditionalImage.query.get_or_404(image_id)
-    character = image_to_promote.character
-    
-    old_cover_filename = character.image_file
-    new_cover_filename = image_to_promote.filename
-    
-    character.image_file = new_cover_filename
-    image_to_promote.filename = old_cover_filename
-    
-    db.session.commit()
-    flash(f'Cover image for {character.name} has been updated!')
-    return redirect(url_for('main.character_detail', character_id=character.id))
-
+# The 'set_cover_image' and 'delete_image' routes have been completely removed.
 
 @main.route('/delete-character/<int:character_id>', methods=['POST'])
 @login_required
 def delete_character(character_id):
     character = Character.query.get_or_404(character_id)
-    
     delete_file(character.image_file)
+    # Since we can't delete individual images anymore, we only need to delete them when the character is deleted.
     for image in character.additional_images:
         delete_file(image.filename)
-
     db.session.delete(character)
     db.session.commit()
     flash(f'{character.name} has been deleted.')
     return redirect(url_for('main.index'))
-
-@main.route('/delete-image/<int:image_id>', methods=['POST'])
-@login_required
-def delete_image(image_id):
-    image = AdditionalImage.query.get_or_404(image_id)
-    character_id = image.character_id
-    delete_file(image.filename)
-    db.session.delete(image)
-    db.session.commit()
-    flash('Image has been deleted.')
-    return redirect(url_for('main.character_detail', character_id=character_id))
-
 
 @main.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -125,7 +86,6 @@ def admin_panel():
             filename = secure_filename(file.filename)
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
-
             new_char = Character(
                 name=request.form.get('name'),
                 age=request.form.get('age'),
@@ -133,23 +93,18 @@ def admin_panel():
                 gender=request.form.get('gender'),
                 image_file=filename
             )
-            
             general_tags_ids = request.form.getlist('general_tags')
             species_tags_ids = request.form.getlist('species_tags')
-            
             for tag_id in general_tags_ids:
                 tag = GeneralTag.query.get(tag_id)
                 if tag: new_char.general_tags.append(tag)
-            
             for tag_id in species_tags_ids:
                 tag = SpeciesTag.query.get(tag_id)
                 if tag: new_char.species_tags.append(tag)
-            
             db.session.add(new_char)
             db.session.commit()
             flash('New character added successfully!')
             return redirect(url_for('main.admin_panel'))
-
     general_tags = GeneralTag.query.all()
     species_tags = SpeciesTag.query.all()
     return render_template('admin_panel.html', general_tags=general_tags, species_tags=species_tags)
@@ -164,22 +119,17 @@ def start_game():
     selected_tags_ids = request.form.getlist('general_tags')
     num_characters = request.form.get('num_characters')
     gender = request.form.get('gender')
-
     query = Character.query
-    
     if gender == 'Boy':
         query = query.filter(Character.gender == 'Boy')
     elif gender == 'Girl':
         query = query.filter(Character.gender == 'Girl')
     elif gender == 'MaleAndFemale':
          query = query.filter(Character.gender.in_(['Boy', 'Girl']))
-
     if 'all' not in selected_tags_ids:
         query = query.filter(Character.general_tags.any(GeneralTag.id.in_(selected_tags_ids)))
-    
     all_filtered_chars = query.all()
     random.shuffle(all_filtered_chars)
-    
     if num_characters == 'all':
         final_list = all_filtered_chars
     else:
@@ -189,7 +139,6 @@ def start_game():
             final_list = all_filtered_chars
         else:
             final_list = all_filtered_chars[:num]
-            
     n = len(final_list)
     if n > 1 and (n & (n-1)) != 0:
         power = 1
@@ -197,11 +146,9 @@ def start_game():
             power *= 2
         final_list = final_list[:power]
         flash(f"Bracket requires a power of 2. Truncating to the nearest power: {power} characters.")
-
     if len(final_list) < 2:
         flash('Not enough characters to start a game with the selected filters. Please try again.')
         return redirect(url_for('main.game_setup'))
-        
     characters_for_game = [{
         'id': char.id,
         'name': char.name,
@@ -210,7 +157,6 @@ def start_game():
         'image_url': url_for('static', filename='uploads/' + char.image_file),
         'additional_image_urls': [url_for('static', filename='uploads/' + img.filename) for img in char.additional_images]
     } for char in final_list]
-
     return render_template('game_play.html', characters_json=json.dumps(characters_for_game))
 
 @main.route('/api/record-vote', methods=['POST'])
@@ -218,14 +164,11 @@ def record_vote():
     data = request.get_json()
     winner_id = data.get('winner_id')
     loser_id = data.get('loser_id')
-
     winner = Character.query.get(winner_id)
     loser = Character.query.get(loser_id)
-
     if winner and loser:
         winner.smash_count += 1
         loser.pass_count += 1
         db.session.commit()
         return jsonify({'success': True, 'message': 'Vote recorded.'})
-    
     return jsonify({'success': False, 'message': 'Character not found.'}), 404
