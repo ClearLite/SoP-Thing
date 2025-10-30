@@ -21,10 +21,24 @@ def delete_file(filename):
     except Exception as e:
         print(f"Error deleting file {filename}: {e}") # Log error
 
+# MODIFIED: This route now handles sorting
 @main.route('/')
 def index():
-    characters = Character.query.order_by(Character.smash_count.desc()).all()
-    return render_template('index.html', characters=characters)
+    # Get the sort method from URL query parameters, default to 'az'
+    sort_method = request.args.get('sort', 'az')
+    
+    query = Character.query
+
+    if sort_method == 'smashes':
+        query = query.order_by(Character.smash_count.desc())
+    elif sort_method == 'passes':
+        query = query.order_by(Character.pass_count.desc())
+    else: # Default to 'az' (A-Z)
+        query = query.order_by(Character.name.asc())
+
+    characters = query.all()
+    # Pass the current sort method to the template to highlight the active button
+    return render_template('index.html', characters=characters, current_sort=sort_method)
 
 @main.route('/character/<int:character_id>', methods=['GET', 'POST'])
 def character_detail(character_id):
@@ -188,7 +202,6 @@ def start_game():
         flash('Not enough characters to start a game with the selected filters. Please try again.')
         return redirect(url_for('main.game_setup'))
         
-    # MODIFIED: Now includes additional image URLs for the game
     characters_for_game = [{
         'id': char.id,
         'name': char.name,
