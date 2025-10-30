@@ -18,7 +18,6 @@
                 {% for tag in character.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
                 {% for tag in character.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
             </div>
-            <!-- NEW two-column layout for stats -->
             <div class="stats-container">
                 <div class="stat-column smash">
                     💖 Smashes: {{ character.smash_count }}
@@ -53,8 +52,8 @@
                 <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Additional image">
             </div>
             {% if current_user.is_authenticated %}
-            <!-- UPDATED: Admin buttons are now always visible at the bottom -->
-            <div class="admin-actions-visible">
+            <!-- DEFINITIVE FIX: Using a new, simplified button bar -->
+            <div class="admin-button-bar">
                 <form method="POST" action="{{ url_for('main.set_cover_image', image_id=image.id) }}" class="admin-action-form">
                     <button type="submit" class="btn-action btn-cover">⭐ Set Cover</button>
                 </form>
