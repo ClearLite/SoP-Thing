@@ -53,18 +53,15 @@ def character_detail(character_id):
 
     return render_template('character_detail.html', character=character)
 
-# NEW: Route to set an additional image as the main cover
 @main.route('/set-cover-image/<int:image_id>', methods=['POST'])
 @login_required
 def set_cover_image(image_id):
     image_to_promote = AdditionalImage.query.get_or_404(image_id)
     character = image_to_promote.character
     
-    # The filenames to be swapped
     old_cover_filename = character.image_file
     new_cover_filename = image_to_promote.filename
     
-    # Swap the filenames in the database
     character.image_file = new_cover_filename
     image_to_promote.filename = old_cover_filename
     
@@ -191,12 +188,14 @@ def start_game():
         flash('Not enough characters to start a game with the selected filters. Please try again.')
         return redirect(url_for('main.game_setup'))
         
+    # MODIFIED: Now includes additional image URLs for the game
     characters_for_game = [{
         'id': char.id,
         'name': char.name,
         'age': char.age,
         'from_where': char.from_where,
-        'image_url': url_for('static', filename='uploads/' + char.image_file)
+        'image_url': url_for('static', filename='uploads/' + char.image_file),
+        'additional_image_urls': [url_for('static', filename='uploads/' + img.filename) for img in char.additional_images]
     } for char in final_list]
 
     return render_template('game_play.html', characters_json=json.dumps(characters_for_game))
