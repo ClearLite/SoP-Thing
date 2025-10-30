@@ -57,7 +57,7 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .card-container {
     position: relative; background: var(--surface-color); border-radius: 15px; overflow: hidden;
     box-shadow: 0 8px 25px rgba(0,0,0,0.5); border: 1px solid #4a4e55; transition: all 0.3s ease-in-out;
-    display: flex; flex-direction: column; /* This helps position the button bar at the bottom */
+    display: flex; flex-direction: column;
 }
 .card-container:hover { transform: translateY(-10px); box-shadow: 0 0 30px var(--glow-color); border-color: var(--primary-color); }
 .character-card-link { text-decoration: none; }
@@ -65,7 +65,7 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .image-container {
     width: 100%; height: 350px; background-color: var(--background-color); display: flex;
     align-items: center; justify-content: center; overflow: hidden;
-    flex-grow: 1; /* Allow the image to take available space */
+    flex-grow: 1;
 }
 .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
 .card-container:hover .image-container img { transform: scale(1.05); }
@@ -84,31 +84,7 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 }
 .btn-delete:hover { background: var(--heart-smash); }
 
-/* --- DEFINITIVE FIX V3: Admin Action Buttons --- */
-.admin-button-bar {
-    background: #25272b;
-    padding: 10px;
-    display: flex;
-    justify-content: space-around;
-    gap: 10px;
-    /* This bar is now part of the normal document flow at the bottom of the card */
-}
-.admin-action-form { margin: 0; flex-grow: 1; display: flex; }
-.btn-action {
-    width: 100%;
-    background: var(--surface-color);
-    border: 1px solid #4a4e55;
-    color: var(--text-muted-color);
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-.btn-action.btn-cover:hover { background: #2980b9; border-color: #2980b9; color: white; }
-.btn-action.btn-delete:hover { background: var(--heart-smash); border-color: var(--heart-smash); color: white; }
-/* --- END FIX V3 --- */
+/* The CSS for the admin buttons on additional image cards has been removed */
 
 .detail-container h1 { font-size: 4rem; text-align: left; margin-bottom: 1rem; }
 .main-character-info { display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start; }
