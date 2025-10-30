@@ -51,7 +51,7 @@
                  <form method="POST" action="{{ url_for('main.delete_character', character_id=char.id) }}"
                   onsubmit="return confirm('Are you sure you want to delete {{ char.name }}? This cannot be undone.');"
                   class="delete-form">
-                    <button type="submit" class="btn-delete">❌</button>
+                    <button type="submit" class="btn-delete" title="Delete {{ char.name }}"><i class="fas fa-trash"></i></button>
                 </form>
             </div>
             {% endif %}
