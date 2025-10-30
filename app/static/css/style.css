@@ -18,8 +18,8 @@ body {
     color: var(--text-color);
     margin: 0; 
     line-height: 1.6;
-    /* NEW: Dynamic and smooth animated gradient background */
-    background: linear-gradient(-45deg, #23272A, #2c2f33, #4d3a44, #382c33);
+    /* UPDATED: Smoother, more complex gradient to prevent banding */
+    background: linear-gradient(-45deg, #2c2f33, #3e353b, #4d3a44, #382c33);
     background-size: 400% 400%;
     animation: animatedGradient 25s ease infinite;
 }
@@ -80,6 +80,8 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
     transition: all 0.2s ease-in-out;
     font-size: 0.9rem;
     border: 1px solid transparent;
+    /* UPDATED: Ensure tags use the standard, non-cursive font */
+    font-family: 'Roboto', sans-serif;
 }
 .tag-checkbox-container label:hover {
     background-color: #5c616a;
