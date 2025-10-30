@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameTitle = document.getElementById('game-title');
     const matchupArea = document.getElementById('matchup-area');
     const winnerArea = document.getElementById('winner-area');
+    const modal = document.getElementById('image-modal');
+    const modalCloseBtn = document.querySelector('.modal-close-btn');
+    const modalImageGallery = document.getElementById('modal-image-gallery');
+    const modalNoImagesMsg = document.getElementById('modal-no-images-msg');
 
     let currentRound = 1;
     let matchups = [];
@@ -10,11 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMatchupIndex = 0;
 
     function createMatchups(characters) {
-        const shuffled = [...characters]; // Create a mutable copy
         const pairings = [];
-        for (let i = 0; i < shuffled.length; i += 2) {
-            if (shuffled[i + 1]) {
-                pairings.push([shuffled[i], shuffled[i + 1]]);
+        for (let i = 0; i < characters.length; i += 2) {
+            if (characters[i + 1]) {
+                pairings.push([characters[i], characters[i + 1]]);
             }
         }
         return pairings;
@@ -23,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderMatchup() {
         matchupArea.innerHTML = '';
         if (currentMatchupIndex >= matchups.length) {
-            // End of round
             startNextRound();
             return;
         }
@@ -31,19 +33,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const [char1, char2] = matchups[currentMatchupIndex];
         
         matchupArea.innerHTML = `
-            <div class="character-card matchup-card" data-winner-id="${char1.id}" data-loser-id="${char2.id}">
-                <img src="${char1.image_url}" alt="${char1.name}">
-                <div class="card-info"><h3>${char1.name}</h3><p>From: ${char1.from_where}</p></div>
+            <div class="matchup-container">
+                <div class="character-card matchup-card" data-winner-id="${char1.id}" data-loser-id="${char2.id}">
+                    <div class="image-container">
+                        <img src="${char1.image_url}" alt="${char1.name}">
+                    </div>
+                    <div class="card-info"><h3>${char1.name}</h3></div>
+                </div>
+                <button class="btn btn-view-images" data-char-index="0"><i class="fas fa-images"></i> View Images</button>
             </div>
-            <h2>VS</h2>
-            <div class="character-card matchup-card" data-winner-id="${char2.id}" data-loser-id="${char1.id}">
-                <img src="${char2.image_url}" alt="${char2.name}">
-                <div class="card-info"><h3>${char2.name}</h3><p>From: ${char2.from_where}</p></div>
+            <h2 class="vs-text">VS</h2>
+            <div class="matchup-container">
+                <div class="character-card matchup-card" data-winner-id="${char2.id}" data-loser-id="${char1.id}">
+                    <div class="image-container">
+                        <img src="${char2.image_url}" alt="${char2.name}">
+                    </div>
+                    <div class="card-info"><h3>${char2.name}</h3></div>
+                </div>
+                <button class="btn btn-view-images" data-char-index="1"><i class="fas fa-images"></i> View Images</button>
             </div>
         `;
         
         document.querySelectorAll('.matchup-card').forEach(card => {
             card.addEventListener('click', handleChoice);
+        });
+
+        document.querySelectorAll('.btn-view-images').forEach(button => {
+            button.addEventListener('click', handleViewImages);
         });
     }
 
@@ -52,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const winnerId = card.dataset.winnerId;
         const loserId = card.dataset.loserId;
 
-        // Record vote on the backend
         try {
             await fetch('/api/record-vote', {
                 method: 'POST',
@@ -63,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Failed to record vote:", error);
         }
         
-        // Find winner object and add to next round
         const winner = matchups[currentMatchupIndex].find(c => c.id == winnerId);
         nextRoundContestants.push(winner);
 
@@ -71,9 +85,35 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMatchup();
     }
 
+    function handleViewImages(event) {
+        const charIndex = parseInt(event.currentTarget.dataset.charIndex, 10);
+        const character = matchups[currentMatchupIndex][charIndex];
+        openImageModal(character);
+    }
+
+    function openImageModal(character) {
+        // Clear previous content
+        modalImageGallery.innerHTML = '';
+        modalNoImagesMsg.style.display = 'none';
+
+        if (character.additional_image_urls && character.additional_image_urls.length > 0) {
+            character.additional_image_urls.forEach(url => {
+                const img = document.createElement('img');
+                img.src = url;
+                modalImageGallery.appendChild(img);
+            });
+        } else {
+            modalNoImagesMsg.style.display = 'block';
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeImageModal() {
+        modal.style.display = 'none';
+    }
+
     function startNextRound() {
         if (nextRoundContestants.length === 1) {
-            // We have a winner!
             displayWinner(nextRoundContestants[0]);
             return;
         }
@@ -93,7 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
         winnerArea.style.display = 'block';
         winnerArea.innerHTML = `
             <div class="character-card winner-card">
-                <img src="${winner.image_url}" alt="${winner.name}">
+                 <div class="image-container">
+                    <img src="${winner.image_url}" alt="${winner.name}">
+                </div>
                 <div class="card-info">
                     <h2>${winner.name}</h2>
                     <p>From: ${winner.from_where}</p>
@@ -102,6 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
+    
+    // Modal event listeners
+    modalCloseBtn.addEventListener('click', closeImageModal);
+    window.addEventListener('click', (event) => {
+        if (event.target == modal) {
+            closeImageModal();
+        }
+    });
 
     // Initial game start
     matchups = createMatchups(initialCharacters);
