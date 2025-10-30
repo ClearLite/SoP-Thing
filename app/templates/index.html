@@ -1,0 +1,31 @@
+<!-- app/templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Hall of Fame</h1>
+    <p>See who's winning hearts!</p>
+    <div class="character-grid">
+        {% for char in characters %}
+        <div class="character-card">
+            <img src="{{ url_for('static', filename='uploads/' + char.image_file) }}" alt="{{ char.name }}">
+            <div class="card-info">
+                <h3>{{ char.name }}</h3>
+                <p><strong>From:</strong> {{ char.from_where }}</p>
+                <p><strong>Age:</strong> {{ char.age }} | <strong>Gender:</strong> {{ char.gender }}</p>
+                <div class="tags">
+                    {% for tag in char.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
+                    {% for tag in char.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
+                </div>
+                <div class="stats">
+                    <span class="smash">💖 Smash: {{ char.smash_count }}</span>
+                    <span class="pass">💔 Pass: {{ char.pass_count }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>No characters have been added yet. An admin needs to add some!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
