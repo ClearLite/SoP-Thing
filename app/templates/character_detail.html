@@ -9,16 +9,23 @@
         </div>
         <div class="main-details">
             <h1>{{ character.name }}</h1>
-            <p><strong>From:</strong> {{ character.from_where }}</p>
-            <p><strong>Age:</strong> {{ character.age }}</p>
-            <p><strong>Gender:</strong> {{ character.gender }}</p>
+            <div class="info-block">
+                <p><strong>From:</strong> {{ character.from_where }}</p>
+                <p><strong>Age:</strong> {{ character.age }}</p>
+                <p><strong>Gender:</strong> {{ character.gender }}</p>
+            </div>
             <div class="tags">
                 {% for tag in character.general_tags %} <span class="tag general">{{ tag.name }}</span> {% endfor %}
                 {% for tag in character.species_tags %} <span class="tag species">{{ tag.name }}</span> {% endfor %}
             </div>
-            <div class="stats">
-                <span class="smash">💖 Smashes: {{ character.smash_count }}</span>
-                <span class="pass">💔 Passes: {{ character.pass_count }}</span>
+            <!-- NEW two-column layout for stats -->
+            <div class="stats-container">
+                <div class="stat-column smash">
+                    💖 Smashes: {{ character.smash_count }}
+                </div>
+                <div class="stat-column pass">
+                    💔 Passes: {{ character.pass_count }}
+                </div>
             </div>
             <a href="{{ url_for('main.index') }}" class="btn btn-back">← Back to Hall of Fame</a>
         </div>
@@ -46,7 +53,8 @@
                 <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Additional image">
             </div>
             {% if current_user.is_authenticated %}
-            <div class="admin-actions">
+            <!-- UPDATED: Admin buttons are now always visible at the bottom -->
+            <div class="admin-actions-visible">
                 <form method="POST" action="{{ url_for('main.set_cover_image', image_id=image.id) }}" class="admin-action-form">
                     <button type="submit" class="btn-action btn-cover">⭐ Set Cover</button>
                 </form>
