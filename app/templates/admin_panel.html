@@ -1,0 +1,52 @@
+<!-- app/templates/admin_panel.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container form-container">
+    <h2>Add New Character</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Age</label>
+            <input type="text" id="age" name="age" required>
+        </div>
+        <div class="form-group">
+            <label for="from_where">From</label>
+            <input type="text" id="from_where" name="from_where" placeholder="e.g., Final Fantasy, Marvel, etc." required>
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="Boy">Boy</option>
+                <option value="Girl">Girl</option>
+                <option value="Mixed">Mixed</option>
+                <option value="Unknown">Unknown</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>General Tags (Hold Ctrl/Cmd to select multiple)</label>
+            <select name="general_tags" multiple required size="5">
+                {% for tag in general_tags %}
+                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Species Tags (Hold Ctrl/Cmd to select multiple)</label>
+            <select name="species_tags" multiple required size="4">
+                {% for tag in species_tags %}
+                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn">Add Character</button>
+    </form>
+</div>
+{% endblock %}
