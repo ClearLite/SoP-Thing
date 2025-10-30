@@ -30,4 +30,4 @@ def init_db_command():
     click.echo("Initialized the database with default tags and admin user.")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5001, debug=True)
