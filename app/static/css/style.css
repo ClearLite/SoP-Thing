@@ -1,8 +1,8 @@
 /* app/static/css/style.css */
-@keyframes animatedGradient {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes backgroundPulse {
+    0% { background-color: #2c2f33; }
+    50% { background-color: #382c33; }
+    100% { background-color: #2c2f33; }
 }
 @keyframes glow {
     from { text-shadow: 0 0 5px #ff80c0, 0 0 10px #ff80c0; }
@@ -14,14 +14,8 @@
     --glow-color: rgba(255, 128, 192, 0.5); --heart-smash: #ff4757; --heart-pass: #bdc3c7;
 }
 body {
-    font-family: 'Roboto', sans-serif;
-    color: var(--text-color);
-    margin: 0; 
-    line-height: 1.6;
-    /* UPDATED: Smoother, more complex gradient to prevent banding */
-    background: linear-gradient(-45deg, #2c2f33, #3e353b, #4d3a44, #382c33);
-    background-size: 400% 400%;
-    animation: animatedGradient 25s ease infinite;
+    font-family: 'Roboto', sans-serif; background-color: var(--background-color); color: var(--text-color);
+    margin: 0; line-height: 1.6; animation: backgroundPulse 15s infinite ease-in-out;
 }
 .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
 h1, h2, h3 { font-family: 'Pacifico', cursive; color: var(--primary-color); text-shadow: 0 0 8px var(--glow-color); }
@@ -51,57 +45,12 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 }
 .btn:hover { background: var(--secondary-color); transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px var(--glow-color); }
 
-/* Styles for the improved tag selection UI */
-.tag-checkbox-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 10px;
-    background-color: var(--background-color);
-    border: 2px solid #4a4e55;
-    border-radius: 8px;
-    padding: 1rem;
-    transition: all 0.3s;
-}
-.tag-checkbox-container:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 10px var(--glow-color);
-}
-.tag-checkbox-container input[type="checkbox"] {
-    display: none; /* Hide the default checkbox */
-}
-.tag-checkbox-container label {
-    display: block;
-    padding: 8px 12px;
-    border-radius: 20px;
-    background-color: #4f545c;
-    color: var(--text-muted-color);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    font-size: 0.9rem;
-    border: 1px solid transparent;
-    /* UPDATED: Ensure tags use the standard, non-cursive font */
-    font-family: 'Roboto', sans-serif;
-}
-.tag-checkbox-container label:hover {
-    background-color: #5c616a;
-    color: white;
-}
-.tag-checkbox-container input[type="checkbox"]:checked + label {
-    background-color: var(--primary-color);
-    color: #000;
-    font-weight: bold;
-    box-shadow: 0 0 10px var(--glow-color);
-    transform: scale(1.05);
-    border-color: var(--secondary-color);
-}
-
 .sort-bar {
     background: var(--surface-color); padding: 1rem; margin-bottom: 2rem; border-radius: 15px;
     display: flex; align-items: center; gap: 1rem; border: 1px solid #4a4e55;
 }
 .sort-bar span { font-weight: bold; color: var(--text-muted-color); }
-.btn-sort { padding: 0.5rem 1rem; font-size: 0.9rem; background: #4a4e55; color: var(--text-muted-color); text-decoration: none; }
+.btn-sort { padding: 0.5rem 1rem; font-size: 0.9rem; background: #4a4e55; color: var(--text-muted-color); text-decoration: none; border-radius: 20px; }
 .btn-sort.active { background: var(--primary-color); color: #000; box-shadow: 0 0 15px var(--glow-color); }
 
 .character-grid, .additional-images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
@@ -120,6 +69,10 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 }
 .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
 .card-container:hover .image-container img { transform: scale(1.05); }
+
+/* NEW: Style for clickable thumbnails */
+.clickable-thumb { cursor: pointer; }
+
 .card-info { padding: 1.5rem; color: var(--text-muted-color); }
 .card-info h3 { margin-top: 0; color: var(--text-color); font-size: 1.8rem;}
 .tags .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; margin: 0.2rem; color: white; }
@@ -132,23 +85,8 @@ nav .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; animation: glow
 .btn-delete {
     background: rgba(0, 0, 0, 0.6); border: none; border-radius: 50%; color: white; cursor: pointer;
     width: 35px; height: 35px; font-size: 1rem; transition: background-color 0.2s;
-    display: flex; align-items: center; justify-content: center;
 }
 .btn-delete:hover { background: var(--heart-smash); }
-
-.additional-image-actions {
-    position: absolute; top: 10px; right: 10px; z-index: 10;
-    display: flex; gap: 0.5rem; background: rgba(0,0,0,0.6);
-    padding: 0.5rem; border-radius: 15px;
-}
-.admin-action-form { margin: 0; }
-.btn-admin {
-    background: transparent; border: none; color: white; cursor: pointer;
-    font-size: 1.1rem; transition: all 0.2s; padding: 0.2rem;
-}
-.btn-admin:hover { transform: scale(1.2); }
-.btn-set-cover:hover { color: #ffd700; }
-.btn-delete-img:hover { color: var(--heart-smash); }
 
 .detail-container h1 { font-size: 4rem; text-align: left; margin-bottom: 1rem; }
 .main-character-info { display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start; }
@@ -176,13 +114,29 @@ hr { border: 0; height: 1px; background-image: linear-gradient(to right, transpa
 .winner-card h2 { font-size: 3rem; color: var(--primary-color); animation: glow 1.5s infinite alternate; }
 @keyframes bounceIn { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
 
+/* Modal Styles */
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
-.modal-content { background: var(--surface-color); margin: auto; padding: 20px; border: 1px solid var(--primary-color); width: 90%; max-width: 1200px; max-height: 90vh; border-radius: 15px; box-shadow: 0 0 30px var(--glow-color); position: relative; display: flex; flex-direction: column; }
 .modal-close-btn { color: var(--text-muted-color); position: absolute; top: 10px; right: 25px; font-size: 35px; font-weight: bold; cursor: pointer; transition: color 0.3s; z-index: 1010; }
 .modal-close-btn:hover { color: var(--primary-color); }
+/* In-Game Gallery Modal */
+.modal-content { background: var(--surface-color); margin: auto; padding: 20px; border: 1px solid var(--primary-color); width: 90%; max-width: 1200px; max-height: 90vh; border-radius: 15px; box-shadow: 0 0 30px var(--glow-color); position: relative; display: flex; flex-direction: column; }
 .modal-image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; overflow-y: auto; padding: 20px; }
 .modal-image-gallery img { width: 100%; border-radius: 8px; }
 #modal-no-images-msg { text-align: center; font-size: 1.5rem; padding: 4rem 0; }
+
+/* NEW: Detail Page Image Viewer Modal */
+.modal-content-viewer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.modal-content-viewer img {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+}
 
 .flash-messages { text-align: center; margin-bottom: 1rem; }
 .flash { background-color: var(--primary-color); color: #000; font-weight: bold; padding: 1rem; border-radius: 8px; box-shadow: 0 0 15px var(--glow-color);}
