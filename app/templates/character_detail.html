@@ -49,23 +49,26 @@
         {% for image in character.additional_images %}
         <div class="card-container">
             <div class="image-container">
-                <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Additional image">
+                <!-- MODIFIED: Added a class to make the image clickable -->
+                <img class="clickable-thumb" src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Additional image">
             </div>
-            {% if current_user.is_authenticated %}
-            <div class="additional-image-actions">
-                 <form method="POST" action="{{ url_for('main.set_cover_image', character_id=character.id, image_id=image.id) }}" class="admin-action-form">
-                    <button type="submit" class="btn-admin btn-set-cover" title="Make this the cover image"><i class="fas fa-star"></i></button>
-                </form>
-                <form method="POST" action="{{ url_for('main.delete_image', image_id=image.id) }}" 
-                      onsubmit="return confirm('Are you sure you want to delete this image?');" class="admin-action-form">
-                    <button type="submit" class="btn-admin btn-delete-img" title="Delete this image"><i class="fas fa-trash"></i></button>
-                </form>
-            </div>
-            {% endif %}
         </div>
         {% else %}
         <p>No additional images have been uploaded for this character yet.</p>
         {% endfor %}
     </div>
 </div>
+
+<!-- NEW: Modal structure for the image viewer -->
+<div id="image-viewer-modal" class="modal" style="display: none;">
+    <span class="modal-close-btn">&times;</span>
+    <div class="modal-content-viewer">
+        <img id="modal-full-image" src="" alt="Full size view">
+    </div>
+</div>
+{% endblock %}
+
+<!-- NEW: Load the specific JavaScript for this page -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/detail.js') }}"></script>
 {% endblock %}
